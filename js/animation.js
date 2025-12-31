@@ -148,9 +148,9 @@ let animator;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize animator
-    // Note: The sprite sheet has 8 frames, but we need to determine the actual frame width
-    // For now, assuming the generated image is 2048x256 (8 frames × 256px each)
-    animator = new SpriteAnimator('animationCanvas', 'images/sprite.png', 256, 256, 8);
+    // Sprite sheet is 1024x1024 with 4x2 grid layout (8 frames)
+    // Each frame is 256x512 (width x height)
+    animator = new SpriteAnimator('animationCanvas', 'images/sprite.png', 256, 512, 8);
 
     // Set total frames display
     const totalFramesEl = document.getElementById('totalFrames');
