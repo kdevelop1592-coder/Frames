@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="중학생을 위한 프레임과 FPS 개념 학습 사이트 - 스프라이트 애니메이션으로 배우는 프레임의 원리">
+    <meta name="keywords" content="프레임, FPS, 애니메이션, 스프라이트, 교육">
+    <meta property="og:title" content="프레임 배우기 - 애니메이션의 원리">
+    <meta property="og:description" content="스프라이트 애니메이션으로 프레임과 FPS를 쉽게 이해하세요!">
+    <meta property="og:type" content="website">
+    <title>프레임 배우기 - 애니메이션의 원리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">🎬 프레임 배우기</h1>
+            <p class="header-subtitle">스프라이트 애니메이션으로 이해하는 프레임의 원리</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Animation Section -->
+            <section class="animation-section">
+                <div class="canvas-container">
+                    <canvas id="animationCanvas" width="256" height="256" aria-label="스프라이트 애니메이션"></canvas>
+                    <div class="frame-info">
+                        <span id="currentFrame">1</span> / <span id="totalFrames">8</span>
+                    </div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="control-panel">
+                    <h2 class="control-title">컨트롤</h2>
+                    
+                    <!-- FPS Control -->
+                    <div class="control-group">
+                        <label for="fpsSlider" class="control-label">
+                            <span>프레임 속도 (FPS)</span>
+                            <span class="fps-value" id="fpsValue">24</span>
+                        </label>
+                        <input 
+                            type="range" 
+                            id="fpsSlider" 
+                            class="fps-slider" 
+                            min="1" 
+                            max="60" 
+                            value="24"
+                            aria-label="FPS 조절 슬라이더"
+                        >
+                        <div class="fps-markers">
+                            <span>1</span>
+                            <span>15</span>
+                            <span>30</span>
+                            <span>45</span>
+                            <span>60</span>
+                        </div>
+                    </div>
+
+                    <!-- Playback Controls -->
+                    <div class="control-group">
+                        <div class="button-group">
+                            <button id="prevBtn" class="control-btn" aria-label="이전 프레임">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M15 18l-6-6 6-6"/>
+                                </svg>
+                            </button>
+                            <button id="playPauseBtn" class="control-btn primary" aria-label="재생/일시정지">
+                                <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                                    <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
+                                </svg>
+                            </button>
+                            <button id="nextBtn" class="control-btn" aria-label="다음 프레임">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 18l6-6-6-6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Performance Monitor -->
+                    <div class="performance-info">
+                        <div class="perf-item">
+                            <span class="perf-label">실제 FPS:</span>
+                            <span class="perf-value" id="actualFps">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Education Section -->
+            <section class="education-section">
+                <!-- What is Frame -->
+                <div class="edu-card">
+                    <div class="edu-icon">🎞️</div>
+                    <h2>프레임이란?</h2>
+                    <p>프레임(Frame)은 애니메이션을 구성하는 <strong>하나하나의 정지 이미지</strong>입니다.</p>
+                    <p>만화책의 각 장면이나 플립북의 각 페이지처럼, 여러 프레임을 빠르게 연속으로 보여주면 움직이는 것처럼 보이게 됩니다.</p>
+                    <div class="example-box">
+                        <p>💡 <strong>예시:</strong> 위의 로봇 애니메이션은 8개의 프레임으로 구성되어 있어요!</p>
+                    </div>
+                </div>
+
+                <!-- What is FPS -->
+                <div class="edu-card">
+                    <div class="edu-icon">⚡</div>
+                    <h2>FPS란?</h2>
+                    <p><strong>FPS (Frames Per Second)</strong>는 1초에 보여지는 프레임의 개수를 의미합니다.</p>
+                    <p>FPS가 높을수록 애니메이션이 더 부드럽게 보이지만, 너무 낮으면 뚝뚝 끊기는 느낌이 듭니다.</p>
+                </div>
+
+                <!-- Comparison Cards -->
+                <div class="comparison-grid">
+                    <div class="comparison-card slow">
+                        <h3>🐢 저속 (6 FPS)</h3>
+                        <p>뚝뚝 끊기는 느낌</p>
+                        <p class="comparison-desc">초기 애니메이션이나 GIF에서 볼 수 있어요</p>
+                    </div>
+                    <div class="comparison-card medium">
+                        <h3>🎬 중속 (24 FPS)</h3>
+                        <p>영화의 표준</p>
+                        <p class="comparison-desc">영화관에서 보는 대부분의 영화</p>
+                    </div>
+                    <div class="comparison-card fast">
+                        <h3>🚀 고속 (60 FPS)</h3>
+                        <p>매우 부드러운 움직임</p>
+                        <p class="comparison-desc">게임이나 스포츠 중계</p>
+                    </div>
+                </div>
+
+                <!-- Real Life Examples -->
+                <div class="edu-card">
+                    <div class="edu-icon">🌍</div>
+                    <h2>실생활 속 FPS</h2>
+                    <ul class="fps-examples">
+                        <li>
+                            <span class="example-icon">🎥</span>
+                            <div>
+                                <strong>영화</strong>
+                                <p>24 FPS - 영화관에서 보는 표준 프레임 속도</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="example-icon">📺</span>
+                            <div>
+                                <strong>TV 방송</strong>
+                                <p>30/60 FPS - 뉴스, 드라마, 예능 프로그램</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="example-icon">🎮</span>
+                            <div>
+                                <strong>게임</strong>
+                                <p>30-144 FPS - 빠른 반응이 필요한 게임은 높은 FPS 사용</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="example-icon">🥽</span>
+                            <div>
+                                <strong>VR (가상현실)</strong>
+                                <p>90+ FPS - 멀미를 방지하기 위해 매우 높은 FPS 필요</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="example-icon">✏️</span>
+                            <div>
+                                <strong>애니메이션</strong>
+                                <p>12-24 FPS - 손으로 그리는 애니메이션 (리미티드 애니메이션)</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Interactive Challenge -->
+                <div class="edu-card challenge">
+                    <div class="edu-icon">🎯</div>
+                    <h2>직접 체험해보세요!</h2>
+                    <p>위의 슬라이더를 움직여서 FPS를 변경해보세요:</p>
+                    <ul class="challenge-list">
+                        <li>✅ 6 FPS로 설정하면 어떤 느낌인가요?</li>
+                        <li>✅ 24 FPS와 60 FPS의 차이를 느껴보세요!</li>
+                        <li>✅ 프레임 단위로 이동 버튼을 눌러 각 프레임을 확인해보세요!</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Made with ❤️ for learning | <a href="https://github.com" target="_blank" rel="noopener">GitHub</a></p>
+        </div>
+    </footer>
+
+    <script src="js/animation.js"></script>
+</body>
+</html>
