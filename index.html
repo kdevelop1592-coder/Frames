@@ -33,7 +33,7 @@
             <!-- Animation Section -->
             <section class="animation-section">
                 <div class="canvas-container">
-                    <canvas id="animationCanvas" width="256" height="512" aria-label="스프라이트 애니메이션"></canvas>
+                    <canvas id="animationCanvas" aria-label="스프라이트 애니메이션"></canvas>
                     <div class="frame-info">
                         <span id="currentFrame">1</span> / <span id="totalFrames">8</span>
                     </div>
@@ -93,6 +93,12 @@
                             <span class="perf-label">실제 FPS:</span>
                             <span class="perf-value" id="actualFps">0</span>
                         </div>
+                    </div>
+
+                    <!-- Sprite Info Display -->
+                    <div id="spriteInfo" class="sprite-info">
+                        <strong>🎨 스프라이트 정보</strong><br>
+                        로딩 중...
                     </div>
                 </div>
             </section>

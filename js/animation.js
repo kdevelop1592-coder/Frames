@@ -4,7 +4,7 @@
  */
 
 class SpriteAnimator {
-    constructor(canvasId, spriteImagePath, frameWidth, frameHeight, totalFrames) {
+    constructor(canvasId, spriteImagePath, totalFrames, frameWidth = null, frameHeight = null) {
         // Canvas setup
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
@@ -15,6 +15,10 @@ class SpriteAnimator {
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
         this.totalFrames = totalFrames;
+
+        // Grid layout (will be calculated if auto-detecting)
+        this.framesPerRow = 4; // Default, will be updated
+        this.framesPerCol = 2; // Default, will be updated
 
         // Animation state
         this.currentFrame = 0;
@@ -37,13 +41,82 @@ class SpriteAnimator {
 
     loadSprite() {
         this.spriteImage.onload = () => {
+            // Auto-detect frame dimensions if not provided
+            if (!this.frameWidth || !this.frameHeight) {
+                this.detectSpriteLayout();
+            } else {
+                // Calculate grid layout from provided dimensions
+                this.framesPerRow = Math.floor(this.spriteImage.width / this.frameWidth);
+                this.framesPerCol = Math.floor(this.spriteImage.height / this.frameHeight);
+            }
+
             console.log('Sprite loaded successfully');
+            this.displaySpriteInfo();
             this.render();
         };
         this.spriteImage.onerror = () => {
             console.error('Failed to load sprite image');
         };
         this.spriteImage.src = this.spriteImagePath;
+    }
+
+    detectSpriteLayout() {
+        const imgWidth = this.spriteImage.width;
+        const imgHeight = this.spriteImage.height;
+
+        // Find the best grid layout for the total frames
+        const bestLayout = this.findBestGridLayout(this.totalFrames, imgWidth, imgHeight);
+
+        this.framesPerRow = bestLayout.cols;
+        this.framesPerCol = bestLayout.rows;
+        this.frameWidth = Math.floor(imgWidth / bestLayout.cols);
+        this.frameHeight = Math.floor(imgHeight / bestLayout.rows);
+
+        // Auto-adjust canvas size to match frame dimensions
+        this.canvas.width = this.frameWidth;
+        this.canvas.height = this.frameHeight;
+
+        console.log(`Auto-detected: ${imgWidth}x${imgHeight} → ${bestLayout.cols}x${bestLayout.rows} grid, frame: ${this.frameWidth}x${this.frameHeight}`);
+    }
+
+    findBestGridLayout(totalFrames, imgWidth, imgHeight) {
+        // Find all possible grid combinations
+        const layouts = [];
+        for (let cols = 1; cols <= totalFrames; cols++) {
+            if (totalFrames % cols === 0) {
+                const rows = totalFrames / cols;
+                const frameW = imgWidth / cols;
+                const frameH = imgHeight / rows;
+                const aspectRatio = frameW / frameH;
+
+                layouts.push({
+                    cols,
+                    rows,
+                    frameW,
+                    frameH,
+                    aspectRatio,
+                    // Prefer wider layouts (more columns) for sprite sheets
+                    score: cols * 2 + (aspectRatio > 0.3 && aspectRatio < 3 ? 10 : 0)
+                });
+            }
+        }
+
+        // Sort by score (higher is better)
+        layouts.sort((a, b) => b.score - a.score);
+
+        return layouts[0];
+    }
+
+    displaySpriteInfo() {
+        const infoEl = document.getElementById('spriteInfo');
+        if (infoEl) {
+            infoEl.innerHTML = `
+                <strong>🎨 스프라이트 정보</strong><br>
+                이미지: ${this.spriteImage.width}×${this.spriteImage.height}px<br>
+                그리드: ${this.framesPerRow}×${this.framesPerCol} (${this.totalFrames}프레임)<br>
+                프레임: ${this.frameWidth}×${this.frameHeight}px
+            `;
+        }
     }
 
     setFPS(fps) {
@@ -109,10 +182,9 @@ class SpriteAnimator {
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Calculate source position in sprite sheet (4x2 grid layout)
-        const framesPerRow = 4;
-        const row = Math.floor(this.currentFrame / framesPerRow);
-        const col = this.currentFrame % framesPerRow;
+        // Calculate source position in sprite sheet using dynamic grid layout
+        const row = Math.floor(this.currentFrame / this.framesPerRow);
+        const col = this.currentFrame % this.framesPerRow;
 
         const sx = col * this.frameWidth;
         const sy = row * this.frameHeight;
@@ -147,10 +219,9 @@ class SpriteAnimator {
 let animator;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize animator
-    // Sprite sheet is 1024x1024 with 4x2 grid layout (8 frames)
-    // Each frame is 256x512 (width x height)
-    animator = new SpriteAnimator('animationCanvas', 'images/sprite.png', 256, 512, 8);
+    // Initialize animator with auto-detection
+    // Only specify total frames, let the system detect sprite dimensions
+    animator = new SpriteAnimator('animationCanvas', 'images/sprite.png', 8);
 
     // Set total frames display
     const totalFramesEl = document.getElementById('totalFrames');
