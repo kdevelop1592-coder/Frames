@@ -60,6 +60,79 @@
                         </div>
                     </div>
 
+                    <!-- Sprite Upload Section -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>🖼️ 스프라이트 이미지</span>
+                        </label>
+                        <div class="upload-section">
+                            <input type="file" id="spriteUpload" accept="image/*" class="file-input" aria-label="스프라이트 이미지 업로드">
+                            <label for="spriteUpload" class="file-input-label">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                                </svg>
+                                <span id="fileName">이미지 선택</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Manual Grid Controls -->
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>⚙️ 그리드 설정</span>
+                            <button id="autoDetectBtn" class="small-btn" aria-label="자동 감지">자동</button>
+                        </label>
+                        
+                        <div class="grid-controls">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="totalFrames">총 프레임</label>
+                                    <input type="number" id="totalFrames" class="number-input" min="1" max="100" value="8">
+                                </div>
+                                <div class="input-group">
+                                    <label for="gridCols">열(Cols)</label>
+                                    <input type="number" id="gridCols" class="number-input" min="1" max="20" value="8">
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="frameWidth">프레임 너비</label>
+                                    <input type="number" id="frameWidth" class="number-input" min="1" value="352">
+                                </div>
+                                <div class="input-group">
+                                    <label for="frameHeight">프레임 높이</label>
+                                    <input type="number" id="frameHeight" class="number-input" min="1" value="1536">
+                                </div>
+                            </div>
+
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="offsetX">X 오프셋</label>
+                                    <input type="number" id="offsetX" class="number-input" min="0" value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="offsetY">Y 오프셋</label>
+                                    <input type="number" id="offsetY" class="number-input" min="0" value="0">
+                                </div>
+                            </div>
+
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="spacingX">가로 간격</label>
+                                    <input type="number" id="spacingX" class="number-input" min="0" value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="spacingY">세로 간격</label>
+                                    <input type="number" id="spacingY" class="number-input" min="0" value="0">
+                                </div>
+                            </div>
+
+                            <button id="applyGridBtn" class="apply-btn">적용</button>
+                        </div>
+                    </div>
+
+
                     <!-- Playback Controls -->
                     <div class="control-group">
                         <div class="button-group">

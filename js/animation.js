@@ -35,6 +35,15 @@ class SpriteAnimator {
         // Animation loop ID
         this.animationId = null;
 
+        // Offset and spacing for manual grid configuration
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.spacingX = 0;
+        this.spacingY = 0;
+
+        // Auto-detect mode flag
+        this.autoDetect = true;
+
         // Load sprite image
         this.loadSprite();
     }
@@ -96,7 +105,7 @@ class SpriteAnimator {
                     frameH,
                     aspectRatio,
                     // Prefer wider layouts (more columns) for sprite sheets
-                    score: cols * 2 + (aspectRatio > 0.3 && aspectRatio < 3 ? 10 : 0)
+                    score: cols * 2 + (aspectRatio > 0.1 && aspectRatio < 3 ? 10 : 0)
                 });
             }
         }
@@ -186,8 +195,9 @@ class SpriteAnimator {
         const row = Math.floor(this.currentFrame / this.framesPerRow);
         const col = this.currentFrame % this.framesPerRow;
 
-        const sx = col * this.frameWidth;
-        const sy = row * this.frameHeight;
+        // Apply offset and spacing
+        const sx = this.offsetX + col * (this.frameWidth + this.spacingX);
+        const sy = this.offsetY + row * (this.frameHeight + this.spacingY);
 
         // Draw current frame
         this.ctx.drawImage(
@@ -211,6 +221,81 @@ class SpriteAnimator {
         if (actualFpsEl) {
             actualFpsEl.textContent = this.actualFps;
         }
+    }
+
+    setManualGrid(totalFrames, cols, frameWidth, frameHeight, offsetX = 0, offsetY = 0, spacingX = 0, spacingY = 0) {
+        // Validate inputs
+        if (totalFrames < 1 || cols < 1 || frameWidth < 1 || frameHeight < 1) {
+            console.error('Invalid grid parameters');
+            return false;
+        }
+
+        // Update properties
+        this.totalFrames = totalFrames;
+        this.framesPerRow = cols;
+        this.framesPerCol = Math.ceil(totalFrames / cols);
+        this.frameWidth = frameWidth;
+        this.frameHeight = frameHeight;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.spacingX = spacingX;
+        this.spacingY = spacingY;
+        this.autoDetect = false;
+
+        // Update canvas size to match frame dimensions
+        this.canvas.width = frameWidth;
+        this.canvas.height = frameHeight;
+
+        // Reset to first frame
+        this.currentFrame = 0;
+        this.render();
+        this.updateFrameDisplay();
+        this.displaySpriteInfo();
+
+        console.log(`Manual grid set: ${cols}x${this.framesPerCol}, frame: ${frameWidth}x${frameHeight}`);
+        return true;
+    }
+
+    loadFromFile(file) {
+        return new Promise((resolve, reject) => {
+            if (!file || !file.type.startsWith('image/')) {
+                reject(new Error('Invalid file type'));
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.spriteImagePath = e.target.result;
+                this.spriteImage.onload = () => {
+                    console.log('New sprite loaded from file');
+
+                    // Auto-detect if enabled
+                    if (this.autoDetect) {
+                        this.detectSpriteLayout();
+                    }
+
+                    this.render();
+                    this.displaySpriteInfo();
+                    resolve();
+                };
+                this.spriteImage.onerror = () => {
+                    reject(new Error('Failed to load image'));
+                };
+                this.spriteImage.src = this.spriteImagePath;
+            };
+            reader.onerror = () => {
+                reject(new Error('Failed to read file'));
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    triggerAutoDetect() {
+        this.autoDetect = true;
+        this.detectSpriteLayout();
+        this.render();
+        this.displaySpriteInfo();
+        console.log('Auto-detect triggered');
     }
 }
 
@@ -280,6 +365,71 @@ document.addEventListener('DOMContentLoaded', () => {
             pauseIcon.style.display = 'none';
         }
         animator.nextFrame();
+    });
+
+    // Sprite Upload
+    const spriteUpload = document.getElementById('spriteUpload');
+    const fileName = document.getElementById('fileName');
+
+    spriteUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            try {
+                fileName.textContent = file.name;
+                await animator.loadFromFile(file);
+
+                // Update UI fields with detected values
+                document.getElementById('totalFrames').value = animator.totalFrames;
+                document.getElementById('gridCols').value = animator.framesPerRow;
+                document.getElementById('frameWidth').value = animator.frameWidth;
+                document.getElementById('frameHeight').value = animator.frameHeight;
+
+                console.log('Sprite uploaded successfully');
+            } catch (error) {
+                console.error('Error loading sprite:', error);
+                fileName.textContent = '업로드 실패';
+            }
+        }
+    });
+
+    // Auto Detect Button
+    const autoDetectBtn = document.getElementById('autoDetectBtn');
+    autoDetectBtn.addEventListener('click', () => {
+        animator.triggerAutoDetect();
+
+        // Update UI fields with detected values
+        document.getElementById('totalFrames').value = animator.totalFrames;
+        document.getElementById('gridCols').value = animator.framesPerRow;
+        document.getElementById('frameWidth').value = animator.frameWidth;
+        document.getElementById('frameHeight').value = animator.frameHeight;
+    });
+
+    // Apply Grid Button
+    const applyGridBtn = document.getElementById('applyGridBtn');
+    applyGridBtn.addEventListener('click', () => {
+        const totalFrames = parseInt(document.getElementById('totalFrames').value);
+        const gridCols = parseInt(document.getElementById('gridCols').value);
+        const frameWidth = parseInt(document.getElementById('frameWidth').value);
+        const frameHeight = parseInt(document.getElementById('frameHeight').value);
+        const offsetX = parseInt(document.getElementById('offsetX').value) || 0;
+        const offsetY = parseInt(document.getElementById('offsetY').value) || 0;
+        const spacingX = parseInt(document.getElementById('spacingX').value) || 0;
+        const spacingY = parseInt(document.getElementById('spacingY').value) || 0;
+
+        const success = animator.setManualGrid(
+            totalFrames,
+            gridCols,
+            frameWidth,
+            frameHeight,
+            offsetX,
+            offsetY,
+            spacingX,
+            spacingY
+        );
+
+        if (success) {
+            console.log('Manual grid applied successfully');
+        }
     });
 
     // Keyboard controls
