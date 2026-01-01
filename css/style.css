@@ -158,7 +158,6 @@ strong {
 }
 
 .canvas-container:hover {
-    transform: translateY(-4px);
     box-shadow: var(--shadow-xl), var(--shadow-glow);
 }
 
